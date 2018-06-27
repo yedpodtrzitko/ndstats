@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% load planner_tags %}
+
+{% block header %}
+{% endblock %}
+
+{% block content %}
+    <table class="table table-condensed table-att">
+        <thead>
+        <tr>
+            <th></th>
+            <th>{{ event.when|date:"d.m.Y @ H:i e" }}</th>
+        </tr>
+        </thead>
+        {% for player in players %}
+            <tr>
+                <td>
+                    <img src="{{ player.player.extra_data.avatar }}"
+                         style="width:26px;height:26px;"/>
+                    {{ player.player.extra_data.nick }}
+                </td>
+                {% participate event player.player as attend_state %}
+                <td class="attend-{{ attend_state.0 }}">
+                    {{ attend_state.1 }}
+                </td>
+            </tr>
+
+        {% endfor %}
+    </table>
+
+{% endblock %}
+
+{% block bottom_scripts %}
+{% endblock %}

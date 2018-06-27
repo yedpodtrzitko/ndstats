@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+
+{% load ndstats_tags %}
+
+{% block content %}
+    <div class="container">
+        <table class="table table-striped" id="matchlist">
+            <tr>
+                <th>Match ID</th>
+                <th>Server</th>
+                <th>Map</th>
+                <th>Result</th>
+                <th>Duration</th>
+                <th class="bg-consortium">Consortium</th>
+                <th class="bg-empire">Empire</th>
+            </tr>
+
+            {% for item in object_list %}
+                <tr>
+                    <td>
+                        <a href="{{ item.get_absolute_url }}">
+                            #{{ item.id }}
+                        </a>
+                    </td>
+                    <td>
+                        {% firstof item.server.name "-unnamed-" %}
+                    </td>
+                    <td>
+                        {{ item.map }}
+                    </td>
+                    <td>
+                        {% if item.winner == TEAM_EMP %}
+                            <span class="empire">Empire Victory</span>
+                        {% elif item.winner == TEAM_CONS %}
+                            <span class="consortium">Consortium Victory</span>
+                        {% else %}
+                            Draw
+                        {% endif %}
+                    </td>
+                <td>
+                    {{ item.duration }}
+                </td>
+                    <td>
+                        {% firstof item.commanders|lookup:TEAM_EMP '-' %}
+                    </td>
+                    <td>
+                        {% firstof item.commanders|lookup:TEAM_CONS '-' %}
+
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+{% endblock %}

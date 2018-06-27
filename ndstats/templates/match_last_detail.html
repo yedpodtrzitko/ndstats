@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% load ndstats_tags %}
+
+{% block bottom_scripts %}{% endblock %}
+
+{% block header %}{% endblock %}
+
+{% block bodyclass %}lastmatch{% endblock %}
+
+{% block content %}
+  <table class="table table-bordered stats">
+    <tr>
+      {% if object.winner == TEAM_EMP %}
+        <td colspan="4" class="winner">
+          <h3>WINNER</h3>
+        </td>
+        <td colspan="4">
+          <h3>ndix.vanyli.net</h3>
+        </td>
+      {% elif object.winner == TEAM_CONS %}
+        <td colspan="4">
+          <h3>ndix.vanyli.net</h3>
+        </td>
+        <td class="winner" colspan="4">
+          <h3>WINNER</h3>
+        </td>
+      {% else %}
+        <td colspan="8">
+          <h3>Last Game Stats via ndix.vanyli.net</h3>
+        </td>
+      {% endif %}
+
+    </tr>
+
+    <tr>
+      <th class="empire" colspan="4">
+        Empire
+      </th>
+
+      <th class="consortium" colspan="4">
+        Consortium
+      </th>
+    </tr>
+    <tr>
+      <td></td>
+      <td class="widetitle">score</td>
+      <td class="widetitle">kills</td>
+      <td class="widetitle">blds</td>
+
+
+      <td></td>
+      <td class="widetitle">score</td>
+      <td class="widetitle">kills</td>
+      <td class="widetitle">blds</td>
+
+    </tr>
+
+    <tr>
+      <th colspan="8">
+        Commanders
+      </th>
+    </tr>
+    <tr>
+      {% with commanders|lookup:TEAM_EMP as comm %}
+        {% player_line comm %}
+      {% endwith %}
+
+      {% with commanders|lookup:TEAM_CONS as comm %}
+        {% player_line comm %}
+      {% endwith %}
+    </tr>
+    <tr>
+      <th colspan="8">
+        Final teams
+
+      </th>
+    </tr>
+    {% for index in players.final_range %}
+      <tr>
+      {% with players.final|lookup:TEAM_EMP|lookup:index as player %}
+        {% player_line player %}
+      {% endwith %}
+
+      {% with players.final|lookup:TEAM_CONS|lookup:index as player %}
+        {% player_line player %}
+      {% endwith %}
+    {% endfor %}
+
+    <tr>
+      <th colspan="8">
+
+        Infidels (left during the game)
+      </th>
+    </tr>
+    {% for index in players.infidel_range %}
+      <tr>
+
+        {% with players.infidel|lookup:TEAM_EMP|lookup:index as player %}
+          {% player_line player %}
+        {% endwith %}
+
+        {% with players.infidel|lookup:TEAM_CONS|lookup:index as player %}
+          {% player_line player %}
+        {% endwith %}
+
+      </tr>
+    {% endfor %}
+
+  </table>
+
+{% endblock %}

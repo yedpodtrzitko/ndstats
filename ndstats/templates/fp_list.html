@@ -1,0 +1,22 @@
+<html>
+
+<body>
+{% for product in object_list %}
+    <h1>List of products:</h1>
+    <div style="border:1px solid black;">
+
+        <h2>
+            <a href="{% url 'fooddetail' product.pk %}">
+
+                {{ product.name }}
+            </a>
+        </h2>
+
+        <p>{{ product.description }}</p>
+    </div>
+
+{% endfor %}
+
+</body>
+
+</html>

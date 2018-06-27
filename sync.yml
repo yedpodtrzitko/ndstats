@@ -1,0 +1,44 @@
+---
+- name: update Python project
+  hosts: vanyli
+  vars:
+    - project_folder: /var/www/ndbattle/
+    - project_name: ndbattle
+    - version: "{{ lookup('file', './version') }}"
+  tasks:
+    - name: prepare archive
+      local_action: shell tar czf "./{{ project_name }}.tar.gz" .
+      become: false
+
+    - name: create folder
+      file: path="{{ project_folder }}{{ version }}/{{ project_name }}/static" state=directory
+      become: true
+
+    - name: chown fix
+      shell: "chown -R yed {{ project_folder }}{{ version }}"
+      become: true
+
+    - name: make virtualenv
+      shell: python3 -m venv "{{ project_folder }}{{ version }}/venv"
+
+    - name: unpack archive
+      unarchive: src="{{ project_name }}.tar.gz" dest={{ project_folder }}{{ version }}/{{ project_name }}
+
+    - name: install project
+      pip:
+        virtualenv="{{ project_folder }}{{ version }}/venv/" name="pip" extra_args="-U"
+
+    - name: install project
+      pip: virtualenv="{{ project_folder }}{{ version }}/venv/" editable=true name="{{ project_folder }}{{ version }}/{{ project_name }}/"
+
+    - name: delete local.py settings
+      shell: rm {{ project_folder }}{{ version }}/{{ project_name }}/ndbattle/settings/local* || true
+
+    - name: run migrations
+      shell: "{{ project_folder }}{{ version }}/venv/bin/{{ project_name }}-manage migrate"
+
+    - name: symlink
+      shell: "ln -snf {{ project_folder }}{{ version }} {{ project_folder }}current"
+
+    - name: collect static
+      shell: "{{ project_folder }}{{ version }}/venv/bin/{{ project_name }}-manage collectstatic --noinput"

@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% load ndstats_tags %}
+{% load static %}
+
+{% block bodyclass %}matchdetail{% endblock %}
+{% block extra_meta %}
+    {{ block.super }}
+    <script src="{% static "js/ocanvas-2.7.3.js" %}"></script>
+    <script src="{% static "js/react-with-addons.min.js" %}"></script>
+    <script src="{% static "js/ndmap.js" %}"></script>
+    <script src="{% static "js/mapcoords.js" %}"></script>
+    <style type="text/css">
+        #map {
+            background-image: url('{% static "img/maps/" %}{{ object.map }}.jpg');
+        }
+    </style>
+{% endblock %}
+{% block bottom_scripts %}
+    {{ block.super }}
+
+    <script>
+        React.render(
+            React.createElement(NDProgress, {
+                map: '{{ object.map }}',
+                urldata: "{% url 'match_events' object.pk %}"
+            }),
+            document.getElementById('map-wrapper')
+        )
+    </script>
+{% endblock %}
+{% block content %}
+    <div class="container">
+        <div class="clearfix title">
+            <div class="col-sm-4">
+                <h1>Match #{{ object.id }}</h1>
+            </div>
+            <div class="col-sm-8">
+                <ul class="nav navbar-nav match-properties">
+                    <li class="col-sm-3 pull-right">
+                        <h5>{{ object.duration }}</h5>
+                        Duration
+                    </li>
+                    <li class="col-sm-3 pull-right">
+                        <h5>{{ object.map|capfirst }}</h5>
+                        Map
+                    </li>
+
+                    <li class="col-sm-3 pull-right">
+                        <h5>{{ object.server }}</h5>
+                        Server
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        {% if object.winner == TEAM_EMP %}
+            <div class="winner empire">
+                <h3>Empire Victory</h3>
+            </div>
+        {% elif object.winner == TEAM_CONS %}
+            <div class="winner consortium">
+                <h3>Consortium Victory</h3>
+            </div>
+        {% else %}
+            <div>
+                <h3>Draw</h3>
+            </div>
+        {% endif %}
+
+
+        <table class="table table-striped">
+            <tr>
+                <th class="bg-empire" colspan="5">
+                    Empire
+                </th>
+
+                <th class="bg-consortium" colspan="5">
+                    Consortium
+                </th>
+            </tr>
+            <tr class="stats-legend">
+                {% for _ in "ec" %}
+                    <td>Player</td>
+                    <td><span title="score">S</span></td>
+                    <td><span title="kills">&#128128;</span></td>
+                    <td><span title="buildings destroyed">B</span></td>
+                    <td><span title="time spent (H:MM)">&#9201;</span></td>
+                {% endfor %}
+            </tr>
+
+            <tr class="bg-commander">
+                {% with object.commanders|lookup:TEAM_EMP as comm %}
+                    {% player_line comm TEAM_EMP True %}
+                {% endwith %}
+
+                {% with object.commanders|lookup:TEAM_CONS as comm %}
+                    {% player_line comm TEAM_CONS True %}
+                {% endwith %}
+            </tr>
+
+            {% for index in final_range %}
+                <tr>
+                {% with object.players|lookup:TEAM_EMP|lookup:index as player %}
+                    {% player_line player TEAM_EMP %}
+                {% endwith %}
+
+                {% with object.players|lookup:TEAM_CONS|lookup:index as player %}
+                    {% player_line player TEAM_CONS %}
+                {% endwith %}
+            {% endfor %}
+        </table>
+        <div id="map-wrapper" class="text-center">
+        </div>
+        <span id="tooltip" class="hint hint-bottom"></span>
+    </div>
+
+{% endblock %}

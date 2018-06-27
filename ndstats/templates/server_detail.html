@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block title %}Server Detail{% endblock %}
+
+{% block content %}
+  <div class="container">
+
+    <h3>Available servers</h3>
+
+    <div class="serverlist row">
+      {% for x in servers %}
+        <div
+            class="col-sm-2 bs-callout {% if x == object %}bs-callout-primary{% else %}bs-callout-default{% endif %}">
+          <a href="{{ x.get_absolute_url }}">{{ x.name }}</a>
+        </div>
+      {% endfor %}
+    </div>
+
+    <div class="row">
+      <h4>Map {{ object.remote_info.info.map }}, Players: {{ object.remote_info.info.player_count }}</h4>
+      <table class="table table-striped">
+        <tr>
+          <th>#</th>
+          <th>Nick</th>
+          <th>Score</th>
+        </tr>
+        {% for player in object.remote_info.players.players %}
+          <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ player.name }}</td>
+            <td>{{ player.score }}</td>
+          </tr>
+        {% endfor %}
+      </table>
+    </div>
+
+  </div>
+
+{% endblock %}

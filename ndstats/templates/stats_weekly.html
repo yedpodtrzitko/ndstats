@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block header %}{% endblock %}
+
+{% block bodyclass %}lastmatch{% endblock %}
+
+
+{% block content %}
+
+  <h3 class="text-center">
+    7 days stats | ndix.vanyli.net
+  </h3>
+  <table class="table table-bordered stats">
+    <tr>
+      <th>#</th>
+      <th>Player</th>
+      <th>Score</th>
+      <th>Kills</th>
+    </tr>
+    {% for player in match_players %}
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>
+          {{ player.player__nick }}
+        </td>
+        <td>
+          {{ player.player_score }}
+        </td>
+      <td>
+          {{ player.kills__sum }}
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+      <td colspan="3">
+        <h3>No data for last week</h3>
+      </td>
+      </tr>
+    {% endfor %}
+  </table>
+
+
+{% endblock %}

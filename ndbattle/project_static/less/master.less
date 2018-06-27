@@ -1,0 +1,139 @@
+@import "bootstrap.less";
+@import "callout.less";
+@import "_match_detail.less";
+
+@consortium: #64b8ed;
+@empire: #a00;
+@commander: #e5c100;
+
+.bg-empire {
+  background: @empire;
+  color: white;
+}
+
+.bg-consortium {
+  background: @consortium;
+}
+
+.bg-commander {
+  background: @commander;
+
+  td {
+    background: @commander;
+
+  }
+}
+
+.consortium {
+  color: @consortium;
+}
+
+.empire {
+  color: @empire;
+}
+
+.attend-yes {
+  .alert-success;
+}
+
+.attend-no {
+  .alert-danger;
+}
+
+.attend-may {
+  background-color: #ccc;
+}
+
+.attend-com {
+  .alert-success;
+  background-color: @commander !important;
+  color: lightgoldenrodyellow;
+
+  select {
+    color: black;
+  }
+}
+
+.table-att tr {
+  border: 1px solid white !important;
+}
+
+#id_maps {
+  overflow-y: scroll;
+  height: 200px;
+}
+
+.Spectator {
+  background-color: #eee;
+}
+
+#chatlog {
+  td {
+    padding: 2px 10px;
+    line-height: 1;
+  }
+}
+
+.navbar-brand {
+  img {
+    display: inline-block;
+  }
+}
+
+.navbar {
+  margin-bottom: 0;
+}
+
+#matchlist {
+  font-size: 9pt;
+
+  td {
+    text-wrap: none;
+    text-align: left;
+  }
+}
+
+table {
+  th, tr {
+    .text-center;
+  }
+}
+
+.serverlist {
+  div {
+    margin-right: 20px;
+  }
+}
+
+.widetitle {
+  -ms-transform: rotate(270deg);
+  -moz-transform: rotate(270deg);
+  -webkit-transform: rotate(270deg);
+  -o-transform: rotate(270deg);
+
+  padding: 15px 0 !important;
+}
+
+table.stats {
+  background-color: #80570b;
+
+  th, tr, td {
+    border-color: #d4a53f !important;
+
+  }
+}
+
+body.lastmatch {
+  background-color: #80570b;
+  color: white;
+}
+
+body .pagination > li > a {
+  padding: 6px 8px;
+}
+
+.darkheader {
+  background-color: @gray-darker;
+  color: @gray-lighter;
+  padding: 40px 0;
+}

@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% load planner_tags %}
+
+{% block content %}
+    {% for event in events %}
+
+        <div class="event" style="padding-bottom:50px;">
+
+            <h4 class="well well-lg text-center">
+                Event (<a
+                href="http://timeanddate.com/worldclock/fixedtime.html?iso={{ event.when|date:"Ymd\THi" }}&p1=136">
+                {{ event.when|date:"d.m.Y @ H:i e" }}
+            </a>)
+            </h4>
+            <div class="clearfix">
+                <div class="col-sm-5">
+                    <table class="table">
+                        <tr>
+                            <td>Total players</td>
+                            <td> {{ event.players_count }}</td>
+                        </tr>
+                        <tr>
+                            <td>Commanders</td>
+                            <td> {{ event.commanders_count }}</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-sm-5" style="height:200px; overflow:auto;">
+                    <table class="table table-condensed">
+                        <tr>
+                            <td><b>Map</b></td>
+                            <td><b>Votes</b></td>
+                        </tr>
+                        {% for map in event.fav_maps %}
+                            <tr>
+                                <td>{{ map.map__name }}</td>
+                                <td>{{ map.map__count }}</td>
+                            </tr>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+            <div style="padding-top:30px;">
+                <table class="table table-condensed">
+                    {% if user.is_authenticated %}
+                        {% participate event user as ptc %}
+                        <tr>
+                            <td>
+                                <a href="{{ ptc.player.extra_data.profileurl }}">
+                                    <img src="{{ ptc.player.extra_data.avatar }}"
+                                         style="width:26px;height:26px;"/>
+                                    {% firstof ptc.player.extra_data.nick ptc.player.user.username %}
+                                </a>
+                            </td>
+                            <td>
+                                {% get_attend_count ptc.player as attended %}
+                                {{ attended }}x
+                            </td>
+                            <td class="attend-{{ ptc.status }}">
+                                <form action="{% url 'change-attend' event=event.pk %}"
+                                      method="post"
+                                      class="col-sm-6">
+                                    {% csrf_token %}
+                                    <div class="form-group">
+                                        <label>Do you want to attend this event?</label>
+                                        {% for k, state in stories %}
+                                            <div class="form-group">
+                                                <button name="state"
+                                                        value="{{ k }}"
+                                                        class="btn btn-default form-control
+                                                    {% if k == ptc.status %}btn-primary{% endif %}">
+                                                    {{ state }}
+                                                </button>
+                                            </div>
+                                        {% endfor %}
+
+                                    </div>
+                                </form>
+                                <form action="{% url 'change-map' event=event.pk %}"
+                                      method="post" class="col-sm-5">
+                                    {% csrf_token %}
+                                    <div class="form-group">
+                                        <label>
+                                            <ul class="row">
+                                                <li>Select maps you'd like to play (up to {{ event.rounds }})</li>
+                                                <li>you can select more items while holding Ctrl</li>
+                                            </ul>
+                                            {% get_event_maps event ptc.player as map_form %}
+                                            {{ map_form.maps }}
+                                        </label>
+                                    </div>
+                                    <div class="form-group">
+                                        <button type="submit"
+                                                class="btn btn-primary">
+                                            Confirm maps
+                                        </button>
+                                    </div>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endif %}
+                    {% for ptc in event.players %}
+                        {% if ptc.player.user != user %}
+                            <tr>
+                                <td class="col-sm-2 col-md-2">
+                                    <a href="{{ ptc.player.extra_data.profileurl }}">
+                                        <img src="{{ ptc.player.extra_data.avatar }}"
+                                             style="width:26px;height:26px;"/>
+                                        {% firstof ptc.player.extra_data.nick ptc.player.user.username %}
+                                    </a>
+                                </td>
+                                <td class="col-sm-1" style="color:#ddd" title="events attendee">
+                                    {% get_attend_count ptc.player as attended %}
+                                    {{ attended }}x
+                                </td>
+                                <td class="attend-{{ ptc.status }} col-sm-6">
+                                <span class="status">
+                                    {{ ptc.get_status_display }}
+                                </span>
+                                </td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    {% empty %}
+        <h2 class="text-center well-lg well">No upcoming event</h2>
+    {% endfor %}
+{% endblock %}

@@ -1,0 +1,23 @@
+{% load static %}
+<html>
+
+<body>
+    <a href="{% url 'foodproducts' %}">back to the list</a>
+
+    <h1>Detail of product:</h1>
+    <div style="border:1px solid black;">
+
+
+        <h2>Name: {{ object.name }}</h2>
+
+        <p>Weight: {{ object.weight }}</p>
+
+        <p>Description: {{ object.description }}</p>
+
+        <p><img src="{% get_media_prefix %}{{ object.picture }}"></p>
+    </div>
+
+
+</body>
+
+</html>

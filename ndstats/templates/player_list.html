@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% load humanize %}
+
+{% block content %}
+
+    <table class="table table-striped">
+        <tr>
+            <th>#</th>
+            <th></th>
+            <th class="text-left">Nick</th>
+            <th class="text-left col-sm-1">Clan</th>
+
+            <th>Score</th>
+        </tr>
+        {% for player in object_list %}
+            <tr>
+                <td>{{ forloop.counter|add:offset }}</td>
+                <td>
+                    {% if player.avatar %}
+                        <a href="{{ player.get_absolute_url }}">
+
+                            <img src="{{ player.avatar }}"/>
+                        </a>
+
+                    {% endif %}
+                </td>
+                <td class="text-left">
+                    <a href="{{ player.get_absolute_url }}">
+                        {{ player.nick }}
+                    </a>
+                </td>
+                <td class="text-left col-sm-1">{% if player.clantag %}
+                    {# <a href="{% url "players_clan" player.clantag %}">  #}
+                    {{ player.clantag }}
+                    {#  </a>  #}
+                {% endif %}</td>
+
+                <td>{{ player.score|intcomma }}</td>
+            </tr>
+        {% endfor %}
+
+    </table>
+    <ul class="pagination pagination-centered">
+        {% if page_obj.has_previous %}
+            <li><a href="?page=1">&lt;&lt;</a></li>
+            <li><a href="?page={{ page_obj.previous_page_number }}">
+                &lt;</a>
+            </li>
+        {% endif %}
+
+        {% for i in paginator.page_range %}
+            <li {% if page_obj.number == i %}
+                class="active" {% endif %}><a
+                href="?page={{ i }}">{{ i }}</a></li>
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+            <li><a href="?page={{ page_obj.next_page_number }}">&gt;</a>
+            </li>
+            <li><a
+                href="?page={{ page_obj.paginator.num_pages }}">
+                &gt;&gt;</a>
+            </li>
+        {% endif %}
+    </ul>
+
+{% endblock %}

@@ -1,0 +1,10 @@
+Django==1.11.13
+psycopg2-binary
+chaussette==1.3.0
+sorl-thumbnail
+redis
+django-redis
+social-auth-app-django
+raven
+python-valve
+pillow

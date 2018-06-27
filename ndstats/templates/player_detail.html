@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% load static %}
+
+{% block content %}
+    <div class="darkheader">
+        <div class="container">
+            <div class="col-sm-2 profile-portrait">
+                <a href="{{ player.community_url }}">
+                    {% if player.avatar %}
+                        <img src="{{ player.avatar_full }}" style="width:128px;">
+
+                    {% else %}
+                        <img src="{% static "img/steam.png" %}" style="width:100%">
+                    {% endif %}
+                </a>
+            </div>
+            <div class="col-sm-6">
+                <h1>{{ player.nick }}</h1>
+            </div>
+            <div class="col-sm-4">
+                Score
+                <h1>{{ player.score|intcomma }}</h1>
+            </div>
+        </div>
+    </div>
+    <p></p>
+    <div class="container">
+        <div class="row">
+            <div class="col-sm-2">
+                <h4>
+                    Kills
+                </h4>
+            </div>
+            <div class="col-sm-2">
+                <h4>
+
+                    {{ player.kills }}
+                </h4>
+
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

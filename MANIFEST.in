@@ -1,0 +1,11 @@
+include PROJECT
+include MANIFEST.in
+include setup.py
+include requirements.txt
+recursive-include ndbattle *
+recursive-include ndstats *
+global-exclude .coverage
+global-exclude *.pyc
+global-exclude *.pyo
+global-exclude .DS_Store
+exclude ndbattle/settings/local.py

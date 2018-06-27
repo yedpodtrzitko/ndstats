@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+
+{% block title %}Chat Log{% endblock %}
+
+{% block content %}
+
+    <h3>Available servers</h3>
+    <div class="serverlist">
+        {% for x in servers %}
+            {% if x == server %}
+                <div class="col-sm-2 bs-callout bs-callout-primary">
+            {% else %}
+                <div class="col-sm-2 bs-callout bs-callout-default">
+            {% endif %}
+        <a href="{% url 'chat' pk=x.pk %}">{{ x }}</a>
+        </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <table class="table table-bordered" id="chatlog">
+        <tr>
+            <th>Time</th>
+            <th>User</th>
+            <th>Message</th>
+        </tr>
+        {% for x in object_list %}
+            <tr>
+                <td>
+          <span
+              style="color:#ccc">{{ x.timestamp|date:"d.m." }}</span>&nbsp;{{ x.timestamp|date:"H:i" }}
+                </td>
+                <td class="{{ x.get_team_display }}">
+                    {{ x.player.nick }}
+                </td>
+                <td>
+                    {{ x.message }}
+                </td>
+
+            </tr>
+        {% endfor %}
+    </table>
+
+{% endblock %}

@@ -1,0 +1,81 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>{% block title %}NDix Statistics{% endblock %}</title>
+    <meta name="description" content="{% block description %}{% endblock %}">
+    {% block extra_meta %}{% endblock %}
+    <link rel="icon" type="image/png" href="{% static "img/nd_bw.png" %}">
+    <link rel="stylesheet" type="text/css" href="{% static "css/master.css" %}" media="all">
+</head>
+<body class="{% block bodyclass %}{% endblock %}">
+
+{% block header %}
+    <nav class="navbar navbar-default" role="navigation">
+
+        <div class="navbar-header">
+            <a class="navbar-brand" href="/">
+                <img src="{% static "img/nd.png" %}" alt="" style="height:26px;">
+                NDix&nbsp;Stats
+            </a>
+        </div>
+
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+            <ul class="nav navbar-nav">
+                <li class=""><a href="{% url "servers" %}">Servers</a></li>
+                {% if user.is_staff %}
+                    <li class=""><a href="{% url "chat" %}">Chat</a></li>
+                {% endif %}
+                <li class=""><a href="{% url "match_list" %}">Matches</a></li>
+                <li class=""><a href="{% url "players" %}">Players</a></li>
+            </ul>
+
+            <ul class="nav navbar-nav navbar-right">
+                {% if not user.is_authenticated %}
+                    <li>
+                        {% comment %}
+                        <a id="signin" href="">
+                            {# {% url 'social:begin' 'steam' %}"> #}
+                            <img
+                                src="http://cdn.steamcommunity.com/public/images/signinthroughsteam/sits_small.png"
+                                alt="Login via Steam">
+                        </a>
+                        {% endcomment %}
+                    </li>
+                {% else %}
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle"
+                           data-toggle="dropdown">{{ user.username }}
+                            <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="{% url 'logout' %}">Logout</a></li>
+                        </ul>
+                    </li>
+
+                {% endif %}
+            </ul>
+        </div>
+    </nav>
+{% endblock header %}
+
+{% block content %}{% endblock %}
+
+{% block footer %}
+    {% comment %}
+    <footer class="footer-main clearfix">
+        <p>{% now "Y" %} &copy; yedpodtrzitko</p>
+    </footer>
+    {% endcomment %}
+{% endblock footer %}
+
+{% block bottom_scripts %}
+    <script src="{% static "_dev/jquery-2.2.3.min.js" %}"></script>
+    <script src="{% static "js/base.js" %}"></script>
+    <script src="{% static "js/bootstrap.min.js" %}"></script>
+{% endblock bottom_scripts %}
+</body>
+</html>

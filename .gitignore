@@ -1,0 +1,12 @@
+ndlogger/gologger/main
+ndbattle2
+.env*
+_devtmp
+.devtmp
+dump.sql
+*.egg-info
+venv
+ndbattle/settings/local.py
+dist
+*.tar.gz
+*.retry
