@@ -2,7 +2,7 @@ from django.conf.urls import url
 from django.views.generic import RedirectView
 from ndstats.views import ChatView, MatchList, PlayerList, MatchDetail, \
     MatchLastDetail, MatchLastRedirect, ServerList, WeeklyStatsView, \
-    PlayerDetail, MatchEventsJson,  FoodProductsList, FoodProductDetail
+    PlayerDetail, MatchEventsJson
 
 urlpatterns = [
     url(r'^servers/(?P<pk>\d+)/$', ServerList.as_view(), name='servers'),
@@ -17,7 +17,5 @@ urlpatterns = [
     url(r'^matches/sum/$', WeeklyStatsView.as_view(), name='stats_week'),
     url(r'^chat/(?P<pk>\d+)/$', ChatView.as_view(), name='chat'),
     url(r'^chat/$', ChatView.as_view(), name='chat'),
-    url(r'^foodproducts/$', FoodProductsList.as_view(), name='foodproducts'),
-    url(r'^foodproducts/(?P<pk>\d+)/$', FoodProductDetail.as_view(), name='fooddetail'),
     url(r'^$', RedirectView.as_view(url='matches', permanent=True), name='index'),
 ]

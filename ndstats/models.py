@@ -41,10 +41,13 @@ class Error(models.Model):
 
 class Server(models.Model):
     name = models.CharField(max_length=32)
-    ip = models.GenericIPAddressField(unique=True)
+    ip = models.GenericIPAddressField()
     active = models.BooleanField(default=True)
     port = models.PositiveIntegerField(default=27015)
     map = models.CharField(max_length=32, blank=True)
+
+    class Meta:
+        unique_together = ('ip', 'port')
 
     @property
     def full_address(self):
@@ -79,7 +82,7 @@ class Server(models.Model):
         return data
 
     def __str__(self):
-        return self.name or self.ip
+        return self.name or self.full_address
 
     def set_map_name(self, map_name):
         self.map = map_name
@@ -414,15 +417,3 @@ class Chatlog(models.Model):
 class UnknownLine(models.Model):
     ip_address = models.GenericIPAddressField()
     line = models.CharField(max_length=300)
-
-
-class FoodProduct(models.Model):
-    name = models.CharField(max_length=128)
-    weight = models.PositiveIntegerField()
-    price = models.DecimalField(decimal_places=2, max_digits=10)
-    picture = models.ImageField(blank=True)
-    is_available = models.NullBooleanField()
-    description = models.TextField()
-
-    def __str__(self):
-        return self.name

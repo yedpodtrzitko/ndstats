@@ -21,6 +21,6 @@ def handle_log():
             try:
                 parser.parse_raw_line(line)
             except Exception as e:
-                pass  # print(e)
+                print(e)
 
     r.delete(settings.QUEUE_LOCK)

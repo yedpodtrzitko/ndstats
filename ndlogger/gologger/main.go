@@ -5,68 +5,62 @@ import (
     "net"
     "fmt"
     "regexp"
-    "strings"
+    "strconv"
     "github.com/adjust/redismq"
 )
 
 const (
     CONN_PORT = "27500"
-    CONN_TYPE = "tcp"
+    CONN_TYPE = "udp"
     BOT_RE = `^".*?<\d+><BOT><.*?>"`
 )
 
 var reBot, _ = regexp.Compile(BOT_RE)
 
-func main() {
-    ln, err := net.Listen(CONN_TYPE, ":" + CONN_PORT)
-
-    q := redismq.CreateQueue("localhost", "6379", "", 0, "ndstats")
-
+func CheckError(err error) {
     if err != nil {
         fmt.Println("cant bind socket")
         os.Exit(1)
     }
+}
 
-    // Close the listener when the application closes.
-    defer ln.Close()
+func main() {
+    ServerAddr, err := net.ResolveUDPAddr(CONN_TYPE, ":" + CONN_PORT)
+    CheckError(err)
     fmt.Println("Listening on :" + CONN_PORT)
 
+    // Close the listener when the application closes.
+	conn, err := net.ListenUDP(CONN_TYPE, ServerAddr)
+	CheckError(err)
+	defer conn.Close()
+
+    q := redismq.CreateQueue("localhost", "6379", "", 0, "ndstats")
+
     for {
-	    conn, err := ln.Accept()
-        if err != nil {
-            // handle error
-        } else {
-            go handleLine(q, conn)
-        }
+        handleLine(q, conn)
     }
 }
 
-func handleLine(q *redismq.Queue, conn net.Conn) {
-    defer conn.Close()
+func handleLine(q *redismq.Queue, conn *net.UDPConn) {
     buf := make([]byte, 1024)
 
-    msgLen, err := conn.Read(buf)
+    msgLen, addr, err := conn.ReadFromUDP(buf)
     if err != nil {
         fmt.Println("Error reading:", err.Error())
         return
     }
 
-    msgString := string(buf[0:msgLen])
+    msgString := string(buf[4:msgLen])
 
     botMatch := reBot.MatchString(msgString)
     if (botMatch) {
         return
     }
 
-    fullAddr := conn.RemoteAddr().String()
-    addrIdx := strings.LastIndex(fullAddr, ":")
-    addr := fullAddr[0:addrIdx]
-
-    finalMsg := addr + "|" + msgString
+    finalMsg := addr.IP.String() + ":" +  strconv.Itoa(addr.Port) +"|" + msgString
 
     fmt.Println("formatted message: ", finalMsg)
 
     q.Put(finalMsg)
     // redismq::ndstats
-
 }

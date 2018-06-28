@@ -1,11 +1,5 @@
 from django.contrib import admin
-from ndstats.models import Server, Player, PlayerIP, Match, MatchPlayer, Chatlog, FoodProduct
-
-
-@admin.register(FoodProduct)
-class FoodProductAdmin(admin.ModelAdmin):
-    fields = ('name', 'price', 'weight', 'is_available',  'description', 'picture')
-    list_display = ('name', 'price', 'weight', 'is_available',)
+from ndstats.models import Server, Player, PlayerIP, Match, MatchPlayer, Chatlog
 
 
 class PlayersInline(admin.TabularInline):

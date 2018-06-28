@@ -8,7 +8,7 @@ from django.shortcuts import redirect, get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views.generic import ListView, DetailView, RedirectView, TemplateView
 from django.views.generic.detail import BaseDetailView
-from ndstats.models import Chatlog, Match, Player, Server, MatchPlayer, TEAM_EMP, TEAM_CONS, FoodProduct
+from ndstats.models import Chatlog, Match, Player, Server, MatchPlayer, TEAM_EMP, TEAM_CONS
 from django.views.decorators.cache import patch_cache_control
 from functools import wraps
 
@@ -178,13 +178,3 @@ class MatchEventsJson(BaseDetailView):
             dumped.append(x)
 
         return JsonResponse(data=dumped, safe=False)
-
-
-class FoodProductsList(ListView):
-    model = FoodProduct
-    template_name = 'fp_list.html'
-
-
-class FoodProductDetail(DetailView):
-    model = FoodProduct
-    template_name = 'fp_detail.html'

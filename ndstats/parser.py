@@ -15,8 +15,8 @@ from .loggers import world as log_match
 
 
 class LogParser(object):
-    # format of: (IP)|(unicode noise)L(actual data)
-    re_is_log = re.compile(r'(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\|.?L (.*)', re.UNICODE)
+    # format of: (IP):(port)|(unicode noise)L(actual data)
+    re_is_log = re.compile(r'(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}):(\d+)\|.?L (.*)', re.UNICODE)
     # yed_<2><STEAM_1:0:33657626><CONSORTIUM>
     re_actor = re.compile(r'^"(.*?)<(\d+)><(STEAM_.*?)><(.*?)>" (.*)$')
 
@@ -36,57 +36,55 @@ class LogParser(object):
 
     def __init__(self):
         self._active_match = {}
-        self._servers = {s.ip: s for s in Server.objects.all()}
+        self._servers = {(s.ip, s.port): s for s in Server.objects.all()}
 
-    def get_server(self, ip_address):
-        if ip_address in self._servers:
-            return self._servers[ip_address]
+    def get_server(self, ip_address, port):
+        if (ip_address, port) in self._servers:
+            return self._servers[ip_address, port]
 
-        server = Server.objects.create(ip=ip_address)
-        self._servers[ip_address] = server
+        server = Server.objects.create(ip=ip_address, port=port)
+        self._servers[ip_address, port] = server
 
-        return self._servers[ip_address]
+        return self._servers[ip_address, port]
 
     def parse_raw_line(self, raw_json):
         """
         entry point for saving log
         """
 
-        json_line = json.loads(raw_json)
+        json_line = json.loads(raw_json.decode('utf-8'))
         line = json_line['Payload']
-        print('line', line)
         is_rl = self.re_is_log.match(line)
-        if is_rl:
-            ip = is_rl.group(1)
-            line = is_rl.group(2)
+        if not is_rl:
+            return
 
-            try:
-                self.parse_line(ip, line.strip())
-            except UnknownLineError:
+        ip = is_rl.group(1)
+        port = is_rl.group(2)
+        line = is_rl.group(3)
+
+        try:
+            self.parse_line(ip, int(port), line.strip())
+        except UnknownLineError:
+            UnknownLine.objects.create(
+                ip_address=ip,
+                line=line
+            )
+        else:
+            if getattr(settings, 'DEBUG_UNKNOWN', False):
                 UnknownLine.objects.create(
                     ip_address=ip,
                     line=line
                 )
-            else:
-                if getattr(settings, 'DEBUG_UNKNOWN', False):
-                    UnknownLine.objects.create(
-                        ip_address=ip,
-                        line=line
-                    )
 
-    def parse_line(self, ip_address, raw_line, save_unknown=True):
+    def parse_line(self, ip_address, port, raw_line, save_unknown=True):
         # cut off datetime
         line = raw_line[23:]
-
-        # if it's something about a bot, ignore it
-        # if self.re_bot.match(line):
-        # return True
 
         # get datetime
         line_dt = raw_line[:21]
         timestamp = datetime.strptime(line_dt, "%m/%d/%Y - %H:%M:%S")
 
-        server = self.get_server(ip_address)
+        server = self.get_server(ip_address, port)
 
         if line.startswith('Loading map'):
             server.finish_all(timestamp)
@@ -94,18 +92,18 @@ class LogParser(object):
 
         re_world = self.re_world.match(line)
         if re_world:
-            self._active_match[ip_address] = log_match.log(timestamp, line, re_world, server)
+            self._active_match[ip_address, port] = log_match.log(timestamp, line, re_world, server)
             return True
 
-        if not self._active_match.get(ip_address):
-            self._active_match[ip_address] = server.get_unfinished().first()
+        if not self._active_match.get(ip_address, port):
+            self._active_match[ip_address, port] = server.get_unfinished().first()
 
-        if not self._active_match.get(ip_address):
+        if not self._active_match.get(ip_address, port):
             return True
 
         re_team = self.re_team.match(line.strip())
         if re_team:
-            return log_team.log(timestamp, line, re_team, self._active_match[ip_address])
+            return log_team.log(timestamp, line, re_team, self._active_match[ip_address, port])
 
         # is it about player?
         re_player = self.re_actor.match(line)
@@ -116,12 +114,11 @@ class LogParser(object):
             player_team = re_player.group(4)
             strip_line = re_player.group(5)
             match_player = self.parse_player(player_id, player_name,
-                                             self._active_match[ip_address])
-            return log_player.log(timestamp, strip_line, match_player,
-                                  player_team, self)
+                                             self._active_match[ip_address, port])
+            return log_player.log(timestamp, strip_line, match_player, player_team, self)
 
         # it's about some generic stuff
-        return log_generic.log(timestamp, line, self._active_match[ip_address])
+        return log_generic.log(timestamp, line, self._active_match[ip_address, port])
 
     def parse_player(self, player_id, player_nick, match):
         """
