@@ -23,7 +23,7 @@ pytz==2018.4              # via django
 raven==6.9.0
 redis==2.10.6
 requests-oauthlib==1.0.0  # via social-auth-core
-requests==2.19.1          # via python-valve, requests-oauthlib, social-auth-core
+requests==2.20.0          # via python-valve, requests-oauthlib, social-auth-core
 six==1.11.0               # via chaussette, python-valve, social-auth-app-django, social-auth-core
 social-auth-app-django==2.1.0
 social-auth-core==1.7.0   # via social-auth-app-django
